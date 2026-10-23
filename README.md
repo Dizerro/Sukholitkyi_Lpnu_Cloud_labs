@@ -2,7 +2,7 @@
 
 Лабораторна робота 1 з хмарних технологій. Невеликий REST API для нотаток на FastAPI + PostgreSQL. Запакований в Docker, в AWS піднімається через Terraform.
 
-Працює тут: http://notes-api-1935049210.eu-north-1.elb.amazonaws.com
+Працює тут: http://notes-api-1576192979.eu-north-1.elb.amazonaws.com
 (Swagger на `/docs`, перевірка стану на `/health`)
 
 Після `terraform destroy` адреса зникає, при новому деплої вона буде іншою. Поточну можна подивитись командою `terraform output alb_dns`.

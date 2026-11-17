@@ -13,6 +13,9 @@ services:
       timeout: 3s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+
   app:
     build: .
     ports:
@@ -22,6 +25,10 @@ services:
       DB_NAME: notes
       DB_USER: notes
       DB_PASSWORD: ${DB_PASSWORD:-devpass}
+      REDIS_HOST: redis
+      CACHE_ENABLED: ${CACHE_ENABLED:-true}
+      CACHE_TTL: ${CACHE_TTL:-30}
+      CACHE_INVALIDATE: ${CACHE_INVALIDATE:-false}
     depends_on:
       db:
         condition: service_healthy

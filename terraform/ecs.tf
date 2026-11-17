@@ -44,6 +44,12 @@ resource "aws_iam_role" "task" {
 
 resource "aws_ecs_cluster" "main" {
   name = var.project
+
+  # Лаб. 2: без цього немає метрик RunningTaskCount / DesiredTaskCount для панелі
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
 
 resource "aws_ecs_task_definition" "app" {
@@ -59,12 +65,21 @@ resource "aws_ecs_task_definition" "app" {
     name         = "app"
     image        = "${aws_ecr_repository.app.repository_url}:${var.image_tag}"
     essential    = true
+    stopTimeout  = 30
     portMappings = [{ containerPort = 8000 }]
-    environment = [
-      { name = "DB_HOST", value = aws_db_instance.db.address },
-      { name = "DB_NAME", value = "notes" },
-      { name = "DB_USER", value = "notes" },
-    ]
+    environment = concat(
+      [
+        { name = "DB_HOST", value = aws_db_instance.db.address },
+        { name = "DB_NAME", value = "notes" },
+        { name = "DB_USER", value = "notes" },
+      ],
+      var.enable_cache ? [
+        { name = "REDIS_HOST", value = aws_elasticache_cluster.cache[0].cache_nodes[0].address },
+        { name = "CACHE_ENABLED", value = tostring(var.cache_enabled) },
+        { name = "CACHE_TTL", value = tostring(var.cache_ttl) },
+        { name = "CACHE_INVALIDATE", value = tostring(var.cache_invalidate) },
+      ] : []
+    )
     secrets = [
       { name = "DB_PASSWORD", valueFrom = aws_secretsmanager_secret.db.arn },
     ]
@@ -83,7 +98,7 @@ resource "aws_ecs_service" "app" {
   name                              = var.project
   cluster                           = aws_ecs_cluster.main.id
   task_definition                   = aws_ecs_task_definition.app.arn
-  desired_count                     = 2
+  desired_count                     = var.min_tasks
   launch_type                       = "FARGATE"
   health_check_grace_period_seconds = 60
 
@@ -101,8 +116,11 @@ resource "aws_ecs_service" "app" {
 
   depends_on = [aws_lb_listener.http]
 
-  # нові версії розгортає CI/CD, Terraform їх не повинен відкочувати
+  # Лаб. 2: desired_count тепер належить autoscaling, Terraform його не чіпає.
+  # ignore_changes = [task_definition] ПРИБРАНО: CI/CD через OIDC заблокований, нові версії
+  # образу та змінні середовища (Redis, кеш) розгортаються через terraform apply.
+  # Коли OIDC запрацює, поверніть task_definition у цей список.
   lifecycle {
-    ignore_changes = [task_definition]
+    ignore_changes = [desired_count]
   }
 }

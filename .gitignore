@@ -3,4 +3,8 @@
 *.tfstate.*
 terraform.tfvars
 .env
+*.tfstate.backup
+terraform_tfstate.backup
+secret.auto.tfvars
+loadtest/results/*.json
 __pycache__/

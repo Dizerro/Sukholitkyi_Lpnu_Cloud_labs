@@ -1,5 +1,3 @@
-# Завдання 3. Панель моніторингу з п'ятьма графіками.
-
 locals {
   cluster_name = aws_ecs_cluster.main.name
   service_name = aws_ecs_service.app.name

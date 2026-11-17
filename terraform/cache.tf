@@ -1,6 +1,3 @@
-# Завдання 5. Спільний Redis (ElastiCache). Платний: створюйте лише на час тестів (enable_cache = true).
-# Redis у sidecar-контейнері тієї ж задачі НЕ підходить: у кожної задачі був би свій кеш.
-
 resource "aws_security_group" "cache" {
   count  = var.enable_cache ? 1 : 0
   name   = "${var.project}-cache"

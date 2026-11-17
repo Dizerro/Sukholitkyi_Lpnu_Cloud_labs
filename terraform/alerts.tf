@@ -1,5 +1,3 @@
-# Завдання 4. Сповіщення на пошту: тривога і повернення до норми.
-
 resource "aws_sns_topic" "alerts" {
   name = "${var.project}-alerts"
 }

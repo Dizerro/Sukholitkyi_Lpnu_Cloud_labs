@@ -1,5 +1,3 @@
-# ---- Лаб. 2: нові змінні ----
-
 variable "alert_email" {
   description = "Адреса для сповіщень. Передавати через TF_VAR_alert_email, не комітити."
   type        = string

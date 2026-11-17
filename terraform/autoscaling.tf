@@ -1,5 +1,3 @@
-# Завдання 1. Автоматичне горизонтальне масштабування ECS-сервісу.
-
 resource "aws_appautoscaling_target" "app" {
   service_namespace  = "ecs"
   scalable_dimension = "ecs:service:DesiredCount"
